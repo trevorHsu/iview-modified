@@ -1,8 +1,10 @@
 ## iView 修改版
 
-### 该UI库为 iView 2.14.3的修改版，新增了以下特性
-
 [**iView 官方文档**][official-document]
+
+[**iView 官网**][official-website]
+
+### 该UI库为 iView 2.14.3的修改版，新增了以下特性
 
 ***
 ### 1. 新增组件
@@ -72,10 +74,11 @@
 
 
 
-[official-document]: https://github.com/trevorHsu/iview-modified.git/official-document.md
+[official-document]: https://github.com/trevorHsu/iview-modified/blob/master/official-document.md
+[official-website]: https://www.iviewui.com/
 
-[file-optionsForDatepicker]: https://github.com/trevorHsu/iview-modified.git//document_assets/optionsForDatepicker
+[file-optionsForDatepicker]: https://github.com/trevorHsu/iview-modified/tree/master/document_assets/additional-file/optionsForDatepicker
 
-[pic-datepicker2]: https://github.com/trevorHsu/iview-modified.git/document_assets/pic/datepicker2.gif
-[pic-datepicker3]: https://github.com/trevorHsu/iview-modified.git/document_assets/pic/datepicker3.gif
-[pic-tableLazy]: https://github.com/trevorHsu/iview-modified.git/document_assets/pic/tableLazy.gif
+[pic-datepicker2]: https://raw.githubusercontent.com/trevorHsu/iview-modified/master/document_assets/pic/datepicker2.gif
+[pic-datepicker3]: https://raw.githubusercontent.com/trevorHsu/iview-modified/master/document_assets/pic/datepicker3.gif
+[pic-tableLazy]: https://raw.githubusercontent.com/trevorHsu/iview-modified/master/document_assets/pic/tableLazy.gif
