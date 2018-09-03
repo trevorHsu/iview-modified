@@ -4,7 +4,14 @@
 
 [**iView 官网**][official-website]
 
-### 该UI库为 iView 2.14.3的修改版，新增了以下特性
+### 该UI库为 iView 2.14.3的修改版，增加了一些新特性
+
+### 安装 iview-modified
+
+使用 npm:
+```
+npm install iview-modified --save
+```
 
 ***
 ### 1. 新增组件
@@ -12,7 +19,7 @@
 #### a. Datepicker2
 
 > API与原生DatePicker一致，但时间快捷方式的样式不同；<br>
-使用时间快捷方式时，可直接在页面实例通过mixin混入[optionsForDatepicker][file-optionsForDatepicker]中的 optionsForRange，optionsForSingle；
+[optionsForDatepicker][file-optionsForDatepicker]中的 optionsForRange，optionsForSingle存放了预设的时间快捷方式；可通过mixins混入页面实例
 
 ##### 示例
 ```
@@ -29,7 +36,7 @@
 #### b. Datepicker3
 
 > API与原生DatePicker一致，但时间快捷方式的样式不同；<br>
-使用时间快捷方式时，可直接在页面实例通过mixin混入[optionsForDatepicker][file-optionsForDatepicker]中的optionsForRange，optionsForSingle；
+[optionsForDatepicker][file-optionsForDatepicker]中的 optionsForRange，optionsForSingle存放了预设的时间快捷方式；可通过mixins混入页面实例
 
 **event:**
 时间快捷方式选中时，会发出事件：on-shortcut-selected
@@ -48,10 +55,10 @@
 #### c. TableLazy
 
 > 表格内容延迟加载；<br>
-表格首次显示时，只显示一部分数据，当表格内容滚动至底部时，自动插入一部分剩余数据
+首次加载时，只显示一部分数据，当表格内容滚动至底部时，继续载入部分数据
 
 **prop:** 
-@lazyShow: [Boolean, Number]  延迟加载；延迟加载数据时，每次显示的条数；若为true，则每次显示100条；<br>
+@lazyShow: [Boolean, Number]  延迟加载时，每次加载的条数；若为true，则默认每次载入100条；<br>
 使用延迟加载时，需设置表格高度height，否则组件将使用默认高度100px；
 
 ##### 示例
