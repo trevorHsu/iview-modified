@@ -10,7 +10,7 @@
 #### a. Datepicker2
 
 > API与原生DatePicker一致，但时间快捷方式的样式不同；<br>
-使用时间快捷方式时，可直接在页面实例通过mixin混入./document_assets/optionsForDatepicker中的 optionsForRange，optionsForSingle；
+使用时间快捷方式时，可直接在页面实例通过mixin混入[optionsForDatepicker][file-optionsForDatepicker]中的 optionsForRange，optionsForSingle；
 
 ##### 示例
 ```
@@ -27,7 +27,7 @@
 #### b. Datepicker3
 
 > API与原生DatePicker一致，但时间快捷方式的样式不同；<br>
-使用时间快捷方式时，可直接在页面实例通过mixin混入./document_assets/optionsForDatepicker中的optionsForRange，optionsForSingle；
+使用时间快捷方式时，可直接在页面实例通过mixin混入[optionsForDatepicker][file-optionsForDatepicker]中的optionsForRange，optionsForSingle；
 
 **event:**
 时间快捷方式选中时，会发出事件：on-shortcut-selected
@@ -69,7 +69,13 @@
 |autoShow|关闭加载动画，使数据加载过程更流畅|Boolean|Scroll|true|false|
 
 
-[official-document]: ./official-document.md
-[pic-datepicker2]: ./document_assets/pic/datepicker2.gif
-[pic-datepicker3]: ./document_assets/pic/datepicker3.gif
-[pic-tableLazy]: ./document_assets/pic/tableLazy.gif
+
+
+
+[official-document]: https://github.com/trevorHsu/iview-modified.git/official-document.md
+
+[file-optionsForDatepicker]: https://github.com/trevorHsu/iview-modified.git//document_assets/optionsForDatepicker
+
+[pic-datepicker2]: https://github.com/trevorHsu/iview-modified.git/document_assets/pic/datepicker2.gif
+[pic-datepicker3]: https://github.com/trevorHsu/iview-modified.git/document_assets/pic/datepicker3.gif
+[pic-tableLazy]: https://github.com/trevorHsu/iview-modified.git/document_assets/pic/tableLazy.gif
