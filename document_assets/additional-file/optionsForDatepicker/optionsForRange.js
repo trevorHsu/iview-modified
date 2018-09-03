@@ -1,7 +1,7 @@
 // shortcuts for DatePicker with range type
 // mixin to the page instance
 
-import {proStorage} from '@/vendors/localstorage.js';
+// import {proStorage} from '@/vendors/localstorage.js';
 
 let getDayParmas = function () {
     let today = new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate());
@@ -149,18 +149,18 @@ export default {
                             return [sDate, eDate];
                         }
                     },
-                    {
-                        text: '上线至今',
-                        grid: 2,
-                        value () {
-                            let sDate, eDate;
-                            let startservicetime = proStorage.fetch('serverOpenTime');
+                    // {
+                    //     text: '上线至今',
+                    //     grid: 2,
+                    //     value () {
+                    //         let sDate, eDate;
+                    //         let startservicetime = proStorage.fetch('serverOpenTime');
 
-                            sDate = new Date(startservicetime);
-                            eDate = new Date();
-                            return [sDate, eDate];
-                        }
-                    }
+                    //         sDate = new Date(startservicetime);
+                    //         eDate = new Date();
+                    //         return [sDate, eDate];
+                    //     }
+                    // }
                 ]
             }
         };
