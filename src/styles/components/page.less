@@ -31,6 +31,7 @@
         transition: border @transition-time @ease-in-out, color @transition-time @ease-in-out;
 
         a {
+            font-family: "Monospaced Number";
             margin: 0 6px;
             text-decoration: none;
             color: @text-color;
@@ -78,13 +79,15 @@
 
     &-item-jump-prev:hover {
         i:after {
-            content: "\F3D2";
+            content: "\F115";
+            margin-left: -8px;
         }
     }
 
     &-item-jump-next:hover {
         i:after {
-            content: "\F3D3";
+            content: "\F11F";
+            margin-left: -8px;
         }
     }
 
@@ -194,7 +197,7 @@
         margin: 0;
         border: 0;
         height: 24px;
-        line-height: 24px;
+        line-height: normal;
         font-size: 18px;
     }
 
@@ -202,6 +205,7 @@
         display: inline-block;
         //float: left;
         margin-right: 8px;
+        vertical-align: middle;
 
         input {
             width: 30px;
@@ -251,7 +255,7 @@
         margin: 0;
         min-width: @btn-circle-size-small;
         height: @btn-circle-size-small;
-        line-height: @btn-circle-size-small;
+        line-height: @btn-circle-size-small - 2px;
         border: 0;
 
         a {

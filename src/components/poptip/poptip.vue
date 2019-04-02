@@ -27,7 +27,7 @@
                     <div :class="[prefixCls + '-arrow']"></div>
                     <div :class="[prefixCls + '-inner']" v-if="confirm">
                         <div :class="[prefixCls + '-body']">
-                            <i class="ivu-icon ivu-icon-help-circled"></i>
+                            <i class="ivu-icon ivu-icon-ios-help-circle"></i>
                             <div :class="[prefixCls + '-body-message']"><slot name="title">{{ title }}</slot></div>
                         </div>
                         <div :class="[prefixCls + '-footer']">
@@ -52,6 +52,7 @@
     import {directive as clickOutside} from 'v-click-outside-x';
     import TransferDom from '../../directives/transfer-dom';
     import { oneOf } from '../../utils/assist';
+    import { transferIndex, transferIncrease } from '../../utils/transfer-queue';
     import Locale from '../../mixins/locale';
 
     const prefixCls = 'ivu-poptip';
@@ -96,7 +97,9 @@
             },
             transfer: {
                 type: Boolean,
-                default: false
+                default () {
+                    return !this.$IVIEW || this.$IVIEW.transfer === '' ? false : this.$IVIEW.transfer;
+                }
             },
             popperClass: {
                 type: String
@@ -116,6 +119,7 @@
                 showTitle: true,
                 isInput: false,
                 disableCloseUnderTransfer: false,  // transfer 模式下，点击 slot 也会触发关闭
+                tIndex: this.handleGetIndex()
             };
         },
         computed: {
@@ -142,6 +146,9 @@
                 if (this.width) {
                     style.width = `${this.width}px`;
                 }
+
+                if (this.transfer) style['z-index'] = 1060 + this.tIndex;
+
                 return style;
             },
             localeOkText () {
@@ -170,7 +177,7 @@
                 const styles = {};
                 if (this.padding !== '') styles['padding'] = this.padding;
                 return styles;
-            }
+            },
         },
         methods: {
             handleClick () {
@@ -252,6 +259,13 @@
                 }
 
                 return $children;
+            },
+            handleGetIndex () {
+                transferIncrease();
+                return transferIndex;
+            },
+            handleIndexIncrease () {
+                this.tIndex = this.handleGetIndex();
             }
         },
         mounted () {

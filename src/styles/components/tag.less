@@ -1,5 +1,5 @@
 @tag-prefix-cls: ~"@{css-prefix}tag";
-@tag-close-prefix-cls: ivu-icon-ios-close-empty;
+@tag-close-prefix-cls: ivu-icon-ios-close;
 
 .@{tag-prefix-cls} {
     display: inline-block;
@@ -103,6 +103,8 @@
             }
             .@{tag-close-prefix-cls} {
                 margin-left: 18px !important;
+                left: 4px;
+                top: -1px;
             }
         }
 
@@ -174,11 +176,11 @@
     .@{tag-close-prefix-cls} {
         .iconfont-size-under-12px(20px);
         cursor: pointer;
-        margin-left: 8px;
+        margin-left: 2px;
         color: #666;
         opacity: 0.66;
         position: relative;
-        top: 1px;
+        top: -1px;
         //transition: all @transition-time @ease-in-out;
 
         &:hover {
@@ -198,6 +200,9 @@
         .@{tag-close-prefix-cls}:hover {
             color: #fff;
         }
+        //.@{tag-close-prefix-cls}{
+        //    top: 2px;
+        //}
     }
 
     &-primary,
@@ -238,6 +243,9 @@
             border-color: @@lightBorderColor;
             .@{tag-prefix-cls}-text{
                 color: @@darkColor !important;
+            }
+            &.@{tag-prefix-cls}-dot{
+                line-height: 32px;
             }
         }
     }

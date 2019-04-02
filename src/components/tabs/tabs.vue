@@ -10,8 +10,8 @@
                 @keydown.space.prevent="handleTabKeyboardSelect(false)"
             >
                 <div ref="navWrap" :class="[prefixCls + '-nav-wrap', scrollable ? prefixCls + '-nav-scrollable' : '']">
-                    <span :class="[prefixCls + '-nav-prev', scrollable ? '' : prefixCls + '-nav-scroll-disabled']" @click="scrollPrev"><Icon type="chevron-left"></Icon></span>
-                    <span :class="[prefixCls + '-nav-next', scrollable ? '' : prefixCls + '-nav-scroll-disabled']" @click="scrollNext"><Icon type="chevron-right"></Icon></span>
+                    <span :class="[prefixCls + '-nav-prev', scrollable ? '' : prefixCls + '-nav-scroll-disabled']" @click="scrollPrev"><Icon type="ios-arrow-back"></Icon></span>
+                    <span :class="[prefixCls + '-nav-next', scrollable ? '' : prefixCls + '-nav-scroll-disabled']" @click="scrollNext"><Icon type="ios-arrow-forward"></Icon></span>
                     <div ref="navScroll" :class="[prefixCls + '-nav-scroll']">
                         <div ref="nav" :class="[prefixCls + '-nav']" class="nav-text"  :style="navStyle">
                             <div :class="barClasses" :style="barStyle"></div>
@@ -19,7 +19,7 @@
                                 <Icon v-if="item.icon !== ''" :type="item.icon"></Icon>
                                 <Render v-if="item.labelType === 'function'" :render="item.label"></Render>
                                 <template v-else>{{ item.label }}</template>
-                                <Icon v-if="showClose(item)" type="ios-close-empty" @click.native.stop="handleRemove(index)"></Icon>
+                                <Icon v-if="showClose(item)" type="ios-close" @click.native.stop="handleRemove(index)"></Icon>
                             </div>
                         </div>
                     </div>
@@ -32,7 +32,7 @@
 <script>
     import Icon from '../icon/icon.vue';
     import Render from '../base/render';
-    import { oneOf, MutationObserver } from '../../utils/assist';
+    import { oneOf, MutationObserver, findComponentsDownward } from '../../utils/assist';
     import Emitter from '../../mixins/emitter';
     import elementResizeDetectorMaker from 'element-resize-detector';
 
@@ -64,6 +64,9 @@
         name: 'Tabs',
         mixins: [ Emitter ],
         components: { Icon, Render },
+        provide () {
+            return { TabsInstance: this };
+        },
         props: {
             value: {
                 type: [String, Number]
@@ -91,7 +94,12 @@
             closable: {
                 type: Boolean,
                 default: false
-            }
+            },
+            beforeRemove: Function,
+            // Tabs 嵌套时，用 name 区分层级
+            name: {
+                type: String
+            },
         },
         data () {
             return {
@@ -165,7 +173,27 @@
         },
         methods: {
             getTabs () {
-                return this.$children.filter(item => item.$options.name === 'TabPane');
+                // return this.$children.filter(item => item.$options.name === 'TabPane');
+                const AllTabPanes = findComponentsDownward(this, 'TabPane');
+                const TabPanes = [];
+
+                AllTabPanes.forEach(item => {
+                    if (item.tab && this.name) {
+                        if (item.tab === this.name) {
+                            TabPanes.push(item);
+                        }
+                    } else {
+                        TabPanes.push(item);
+                    }
+                });
+
+                // 在 TabPane 使用 v-if 时，并不会按照预先的顺序渲染，这时可设置 index，并从小到大排序
+                TabPanes.sort((a, b) => {
+                    if (a.index && b.index) {
+                        return a.index > b.index ? 1 : -1;
+                    }
+                });
+                return TabPanes;
             },
             updateNav () {
                 this.navList = [];
@@ -247,6 +275,21 @@
                 this.handleChange(index);
             },
             handleRemove (index) {
+                if (!this.beforeRemove) {
+                    return this.handleRemoveTab(index);
+                }
+
+                const before = this.beforeRemove(index);
+
+                if (before && before.then) {
+                    before.then(() => {
+                        this.handleRemoveTab(index);
+                    });
+                } else {
+                    this.handleRemoveTab(index);
+                }
+            },
+            handleRemoveTab (index) {
                 const tabs = this.getTabs();
                 const tab = tabs[index];
                 tab.$destroy();
@@ -377,13 +420,13 @@
                 return false;
             },
             updateVisibility(index){
-                [...this.$refs.panes.children].forEach((el, i) => {
+                [...this.$refs.panes.querySelectorAll(`.${prefixCls}-tabpane`)].forEach((el, i) => {
                     if (index === i) {
-                        [...el.children].forEach(child => child.style.visibility = 'visible');
+                        [...el.children].filter(child=> child.classList.contains(`${prefixCls}-tabpane`)).forEach(child => child.style.visibility = 'visible');
                         if (this.captureFocus) setTimeout(() => focusFirst(el, el), transitionTime);
                     } else {
                         setTimeout(() => {
-                            [...el.children].forEach(child => child.style.visibility = 'hidden');
+                            [...el.children].filter(child=> child.classList.contains(`${prefixCls}-tabpane`)).forEach(child => child.style.visibility = 'hidden');
                         }, transitionTime);
                     }
                 });

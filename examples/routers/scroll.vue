@@ -1,5 +1,5 @@
 <template>
-    <Scroll :on-reach-edge="loadData" :distance-to-edge="-200" :autoShow="true">
+    <Scroll :on-reach-edge="loadData">
         <section v-for="item in list">
             <div class="city">
                 <p>{{ item }}</p>
@@ -17,7 +17,7 @@
         methods: {
             loadData (dir) {
                 return new Promise(resolve => {
-                    // setTimeout(() => {
+                    setTimeout(() => {
                         if (dir > 0) {
                             const first = this.list[0];
                             for (let i = 1; i < 11; i++) {
@@ -30,7 +30,7 @@
                             }
                         }
                         resolve();
-                    // }, 0);
+                    }, 500);
                 });
             }
         }

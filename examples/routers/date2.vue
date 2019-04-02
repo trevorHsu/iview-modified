@@ -9,7 +9,7 @@
         <DatePicker2 type="date" split-panels transfer show-week-numbers placeholder="Select date" style="width: 400px"></DatePicker2>
         <DatePicker2 
             type="datetime" show-week-numbers confirm placeholder="Select date" style="width: 400px"
-            :options="options1" 
+            :options="options1" disabled
         ></DatePicker2>
         
         <br><br><br>
@@ -26,6 +26,7 @@
             type="datetimerange" :options="options1" 
             split-panels transfer show-week-numbers placeholder="Select date" style="width: 400px"
             @on-ok="confirmFn"
+            v-model="rangeDate"
         ></DatePicker2>
 
         
@@ -36,6 +37,7 @@
     export default {
         data(){
             return {
+                rangeDate: ['2019-03-02 00:00:00', '2019-04-06 00:00:00'],
                 options1: {
                     shortcuts: [
                         {
@@ -83,7 +85,7 @@
                                 return [new Date(), date];
                             },
                             onClick: (picker) => {
-                                this.$Message.info('short cut 1');
+                                this.$Message.info('本周');
                             }
                         },
                         {
@@ -94,18 +96,18 @@
                                 return [new Date(), date];
                             },
                             onClick: (picker) => {
-                                this.$Message.info('short cut 2');
+                                this.$Message.info('过去7天');
                             }
                         },
                         {
                             text: '过去30天',
                             value () {
                                 const date = new Date();
-                                date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                                date.setTime(date.getTime() - 3600 * 1000 * 24 * 30);
                                 return [new Date(), date];
                             },
                             onClick: (picker) => {
-                                this.$Message.info('short cut 2');
+                                this.$Message.info('过去30天');
                             }
                         },
 

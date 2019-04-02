@@ -3,8 +3,8 @@
         <ul :class="classes">
             <li>
                 <span :class="arrowClasses" @click="handleExpand">
-                    <Icon v-if="showArrow" type="arrow-right-b"></Icon>
-                    <Icon v-if="showLoading" type="load-c" class="ivu-load-loop"></Icon>
+                    <Icon v-if="showArrow" type="ios-arrow-forward"></Icon>
+                    <Icon v-if="showLoading" type="ios-loading" class="ivu-load-loop"></Icon>
                 </span>
                 <Checkbox
                         v-if="showCheckbox"
@@ -41,6 +41,7 @@
     export default {
         name: 'TreeNode',
         mixins: [ Emitter ],
+        inject: ['TreeInstance'],
         components: { Checkbox, Icon, CollapseTransition, Render },
         props: {
             data: {
@@ -156,7 +157,11 @@
             },
             handleSelect () {
                 if (this.data.disabled) return;
-                this.dispatch('Tree', 'on-selected', this.data.nodeKey);
+                if (this.TreeInstance.showCheckbox && this.TreeInstance.checkDirectly) {
+                    this.handleCheck();
+                } else {
+                    this.dispatch('Tree', 'on-selected', this.data.nodeKey);
+                }
             },
             handleCheck () {
                 if (this.data.disabled) return;

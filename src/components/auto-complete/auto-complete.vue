@@ -73,6 +73,9 @@
             size: {
                 validator (value) {
                     return oneOf(value, ['small', 'large', 'default']);
+                },
+                default () {
+                    return !this.$IVIEW || this.$IVIEW.size === '' ? 'default' : this.$IVIEW.size;
                 }
             },
             icon: {
@@ -90,7 +93,9 @@
             },
             transfer: {
                 type: Boolean,
-                default: false
+                default () {
+                    return this.$IVIEW.transfer === '' ? false : this.$IVIEW.transfer;
+                }
             },
             name: {
                 type: String
@@ -131,7 +136,7 @@
                 this.currentValue = val;
             },
             currentValue (val) {
-                this.$refs.select.query = val;
+                this.$refs.select.setQuery(val);
                 this.$emit('input', val);
                 if (this.disableEmitChange) {
                     this.disableEmitChange = false;
@@ -146,6 +151,7 @@
                 this.$emit('on-search', query);
             },
             handleChange (val) {
+                if (val === undefined || val === null) return;
                 this.currentValue = val;
                 this.$refs.input.blur();
                 this.$emit('on-select', val);
@@ -160,6 +166,7 @@
                 if (!this.clearable) return;
                 this.currentValue = '';
                 this.$refs.select.reset();
+                this.$emit('on-clear');
             }
         }
     };

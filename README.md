@@ -4,7 +4,7 @@
 
 [**iView 官网**][official-website]
 
-### 该UI库为 iView 2.14.3的修改版，增加了一些新特性
+### 该UI库为 iView 3.3.3的修改版，增加了一些新特性
 
 ### 安装 iview-modified
 
@@ -52,22 +52,6 @@ npm install iview-modified --save
 ![][pic-datepicker3]
 
 
-#### c. TableLazy
-
-> 表格内容延迟加载；<br>
-首次加载时，只显示一部分数据，当表格内容滚动至底部时，继续载入部分数据
-
-**prop:** 
-@lazyShow: [Boolean, Number]  延迟加载时，每次加载的条数；若为true，则默认每次载入100条；<br>
-使用延迟加载时，需设置表格高度height，否则组件将使用默认高度100px；
-
-##### 示例
-```
-<TableLazy border :columns="columns1" :data="data1" height='500' :lazyShow="50"></TableLazy>
-```
-
-![][pic-tableLazy]
-
 
 ***
 ### 2. 组件新增特性
@@ -75,7 +59,6 @@ npm install iview-modified --save
 |prop|用途|type|组件名|示例|默认|
 |:-:|:-:|:-:|:-:|:-:|:-:|
 |injectedStyle|通过传入样式对象，修改input框样式|Object|Input<br>DatePicker3|{color: 'red', background: 'blue'}|-|
-|autoShow|关闭加载动画，使数据加载过程更流畅|Boolean|Scroll|true|false|
 
 
 

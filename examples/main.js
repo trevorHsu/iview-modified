@@ -10,7 +10,9 @@ import iView from '../src/index';
 import locale from '../src/locale/lang/zh-CN';
 
 Vue.use(VueRouter);
-Vue.use(iView, { locale });
+Vue.use(iView, {
+    locale
+});
 
 // 开启debug模式
 Vue.config.debug = true;
@@ -18,6 +20,7 @@ Vue.config.debug = true;
 // 路由配置
 const router = new VueRouter({
     esModule: false,
+    mode: 'history',
     routes: [
         {
             path: '/split',
@@ -188,10 +191,6 @@ const router = new VueRouter({
             component: (resolve) => require(['./routers/table.vue'], resolve)
         },
         {
-            path: '/table-lazy',
-            component: (resolve) => require(['./routers/table-lazy.vue'], resolve)
-        },
-        {
             path: '/loading-bar',
             component: (resolve) => require(['./routers/loading-bar.vue'], resolve)
         },
@@ -234,6 +233,10 @@ const router = new VueRouter({
         {
             path: '/cell',
             component: (resolve) => require(['./routers/cell.vue'], resolve)
+        },
+        {
+            path: '/drawer',
+            component: (resolve) => require(['./routers/drawer.vue'], resolve)
         }
     ]
 });

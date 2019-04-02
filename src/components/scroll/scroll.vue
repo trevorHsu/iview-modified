@@ -28,7 +28,7 @@
 
     const prefixCls = 'ivu-scroll';
     const dragConfig = {
-        sensitivity: 10,  // 10
+        sensitivity: 10,
         minimumStartDragOffset: 5, // minimum start drag offset
     };
 
@@ -55,11 +55,7 @@
             loadingText: {
                 type: String
             },
-            distanceToEdge: [Number, Array],
-            autoShow: {
-                type: Boolean,
-                default: false
-            },
+            distanceToEdge: [Number, Array]
         },
         data() {
             const distanceToEdge = this.calculateProximityThreshold();
@@ -96,7 +92,7 @@
                 return [
                     `${prefixCls}-content`,
                     {
-                        [`${prefixCls}-content-loading`]: this.showBodyLoader && !this.autoShow
+                        [`${prefixCls}-content-loading`]: this.showBodyLoader
                     }
                 ];
             },
@@ -121,7 +117,7 @@
             // just to improve feeling of loading and avoid scroll trailing events fired by the browser
             waitOneSecond() {
                 return new Promise(resolve => {
-                    setTimeout(resolve, this.autoShow ? 200 : 1000);
+                    setTimeout(resolve, 1000);
                 });
             },
 
@@ -135,18 +131,16 @@
                 this.isLoading = true;
                 this.showBodyLoader = true;
                 if (dir > 0) {
-                    !this.autoShow && (this.showTopLoader = true);
+                    this.showTopLoader = true;
                     this.topRubberPadding = 20;
                 } else {
-                    !this.autoShow && (this.showBottomLoader = true);
+                    this.showBottomLoader = true;
                     this.bottomRubberPadding = 20;
 
                     // to force the scroll to the bottom while height is animating
                     let bottomLoaderHeight = 0;
                     const container = this.$refs.scrollContainer;
                     const initialScrollTop = container.scrollTop;
-                    const timeSpanSeed = this.autoShow ? 1 : 50;
-
                     for (let i = 0; i < 20; i++) {
                         setTimeout(() => {
                             bottomLoaderHeight = Math.max(
@@ -154,7 +148,7 @@
                                 this.$refs.bottomLoader.getBoundingClientRect().height
                             );
                             container.scrollTop = initialScrollTop + bottomLoaderHeight;
-                        }, i * timeSpanSeed);
+                        }, i * 50);
                     }
                 }
 
@@ -217,9 +211,9 @@
                 }
 
                 // if the scroll is not strong enough, lets reset it
-                !this.autoShow && (this.rubberRollBackTimeout = setTimeout(() => {
+                this.rubberRollBackTimeout = setTimeout(() => {
                     if (!this.isLoading) this.reset();
-                }, 250));
+                }, 250);
 
                 // to give the feeling its ruberish and can be puled more to start loading
                 if (direction > 0 && this.reachedTopScrollLimit) {
@@ -243,10 +237,8 @@
                 const bottomNegativeProximity = this.bottomProximityThreshold < 0 ? this.bottomProximityThreshold : 0;
                 if (scrollDirection == -1 && displacement + bottomNegativeProximity <= dragConfig.sensitivity) {
                     this.reachedBottomScrollLimit = true;
-                    this.autoShow && this.onCallback(-1);
                 } else if (scrollDirection >= 0 && el.scrollTop + topNegativeProximity <= 0) {
                     this.reachedTopScrollLimit = true;
-                    this.autoShow && this.onCallback(1);
                 } else {
                     this.reachedTopScrollLimit = false;
                     this.reachedBottomScrollLimit = false;

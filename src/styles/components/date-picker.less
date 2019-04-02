@@ -14,7 +14,7 @@
         position: relative;
     }
     &-shortcut-dropdown &-rel{
-        margin-right: 100px;
+        margin-right: 110px;
     }
     &-shortcut-dropdown &-shortcut-menu{
         position: absolute;
@@ -224,7 +224,8 @@
         &-arrow-double{
             margin-left: 10px;
             i:after{
-                content: "\F3D2";
+                content: "\F115";
+                margin-left: -8px;
             }
         }
     }
@@ -233,7 +234,8 @@
         &-arrow-double{
             margin-right: 10px;
             i:after{
-                content: "\F3D3";
+                content: "\F11F";
+                margin-left: -8px;
             }
         }
     }
@@ -254,17 +256,9 @@
     }
 
     &-with-week-numbers{
-        // .@{picker-prefix-cls}-panel{
-        //     &-body-date {
-        //         min-width: (@date-picker-cells-width-with-weeknumbers + 20) * 2;
-        //     }
-        // }
         .@{picker-prefix-cls}-panel{
             &-body-date {
                 min-width: (@date-picker-cells-width-with-weeknumbers + 20) * 2;
-            }
-            &-body-date-time-hybrid {
-                min-width: @date-picker-cells-width + @date-picker-cells-width-with-weeknumbers + 20 * 2;
             }
         }
     }

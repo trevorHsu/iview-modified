@@ -54,6 +54,7 @@
                 :placement="placement"
                 ref="dropdown"
                 :data-transfer="transfer"
+                :transfer="transfer"
                 v-transfer-dom
             >
                 <ul v-show="showNotFoundLabel" :class="[prefixCls + '-not-found']"><li>{{ localeNotFoundText }}</li></ul>
@@ -71,7 +72,6 @@
     </div>
 </template>
 <script>
-    import Icon from '../icon';
     import Drop from './dropdown.vue';
     import {directive as clickOutside} from 'v-click-outside-x';
     import TransferDom from '../../directives/transfer-dom';
@@ -135,13 +135,22 @@
         return textContent || (typeof innerHTML === 'string' ? innerHTML : '');
     };
 
+    const checkValuesNotEqual = (value,publicValue,values) => {
+        const strValue = JSON.stringify(value);
+        const strPublic = JSON.stringify(publicValue);
+        const strValues = JSON.stringify(values.map( item => {
+            return item.value;
+        }));
+        return strValue !== strPublic || strValue !== strValues || strValues !== strPublic;
+    };
+
 
     const ANIMATION_TIMEOUT = 300;
 
     export default {
         name: 'iSelect',
         mixins: [ Emitter, Locale ],
-        components: { FunctionalOptions, Drop, Icon, SelectHead },
+        components: { FunctionalOptions, Drop, SelectHead },
         directives: { clickOutside, TransferDom },
         props: {
             value: {
@@ -188,6 +197,9 @@
             size: {
                 validator (value) {
                     return oneOf(value, ['small', 'large', 'default']);
+                },
+                default () {
+                    return !this.$IVIEW || this.$IVIEW.size === '' ? 'default' : this.$IVIEW.size;
                 }
             },
             labelInValue: {
@@ -199,13 +211,15 @@
             },
             placement: {
                 validator (value) {
-                    return oneOf(value, ['top', 'bottom']);
+                    return oneOf(value, ['top', 'bottom', 'top-start', 'bottom-start', 'top-end', 'bottom-end']);
                 },
-                default: 'bottom'
+                default: 'bottom-start'
             },
             transfer: {
                 type: Boolean,
-                default: false
+                default () {
+                    return !this.$IVIEW || this.$IVIEW.transfer === '' ? false : this.$IVIEW.transfer;
+                }
             },
             // Use for AutoComplete
             autoComplete: {
@@ -217,7 +231,10 @@
             },
             elementId: {
                 type: String
-            }
+            },
+            transferClassName: {
+                type: String
+            },
         },
         mounted(){
             this.$on('on-select-selected', this.onOptionClick);
@@ -250,6 +267,7 @@
                 unchangedQuery: true,
                 hasExpectedValue: false,
                 preventRemoteCall: false,
+                filterQueryChange: false,  // #4273
             };
         },
         computed: {
@@ -271,6 +289,7 @@
                     [prefixCls + '-dropdown-transfer']: this.transfer,
                     [prefixCls + '-multiple']: this.multiple && this.transfer,
                     ['ivu-auto-complete']: this.autoComplete,
+                    [this.transferClassName]: this.transferClassName
                 };
             },
             selectionCls () {
@@ -278,12 +297,6 @@
                     [`${prefixCls}-selection`]: !this.autoComplete,
                     [`${prefixCls}-selection-focused`]: this.isFocused
                 };
-            },
-            queryStringMatchesSelectedOption(){
-                const selectedOptions = this.values[0];
-                if (!selectedOptions) return false;
-                const [query, label] = [this.query, selectedOptions.label].map(str => (str || '').trim());
-                return !this.multiple && this.unchangedQuery && query === label;
             },
             localeNotFoundText () {
                 if (typeof this.notFoundText === 'undefined') {
@@ -324,7 +337,7 @@
             },
             canBeCleared(){
                 const uiStateMatch = this.hasMouseHoverHead || this.active;
-                const qualifiesForClear = !this.multiple && this.clearable;
+                const qualifiesForClear = !this.multiple && !this.disabled && this.clearable;
                 return uiStateMatch && qualifiesForClear && this.reset; // we return a function
             },
             selectOptions() {
@@ -351,7 +364,6 @@
                         });
                     });
                 }
-                let hasDefaultSelected = slotOptions.some(option => this.query === option.key);
                 for (let option of slotOptions) {
 
                     const cOptions = option.componentOptions;
@@ -366,16 +378,17 @@
                             );
                         }
 
-                        cOptions.children = children.map(opt => {
+                        // fix #4371
+                        children = children.map(opt => {
                             optionCounter = optionCounter + 1;
                             return this.processOption(opt, selectedValues, optionCounter === currentIndex);
                         });
 
-                        // keep the group if it still has children
-                        if (cOptions.children.length > 0) selectOptions.push({...option});
+                        // keep the group if it still has children  // fix #4371
+                        if (children.length > 0) selectOptions.push({...option,componentOptions:{...cOptions,children:children}});
                     } else {
                         // ignore option if not passing filter
-                        if (!hasDefaultSelected) {
+                        if (this.filterQueryChange) {
                             const optionPassesFilter = this.filterable ? this.validateOption(cOptions) : option;
                             if (!optionPassesFilter) continue;
                         }
@@ -457,8 +470,6 @@
             },
 
             validateOption({children, elm, propsData}){
-                if (this.queryStringMatchesSelectedOption) return true;
-
                 const value = propsData.value;
                 const label = propsData.label || '';
                 const textContent = (elm && elm.textContent) || (children || []).reduce((str, node) => {
@@ -523,6 +534,7 @@
                 this.focusIndex = -1;
                 this.unchangedQuery = true;
                 this.values = [];
+                this.filterQueryChange = false;
             },
             handleKeydown (e) {
                 if (e.key === 'Backspace'){
@@ -552,8 +564,14 @@
                     if (e.key === 'Enter') {
                         if (this.focusIndex === -1) return this.hideMenu();
                         const optionComponent = this.flatOptions[this.focusIndex];
-                        const option = this.getOptionData(optionComponent.componentOptions.propsData.value);
-                        this.onOptionClick(option);
+
+                        // fix a script error when searching
+                        if (optionComponent) {
+                            const option = this.getOptionData(optionComponent.componentOptions.propsData.value);
+                            this.onOptionClick(option);
+                        } else {
+                            this.hideMenu();
+                        }
                     }
                 } else {
                     const keysThatCanOpenSelect = ['ArrowUp', 'ArrowDown'];
@@ -622,11 +640,29 @@
                     if (!this.autoComplete) this.$nextTick(() => inputField.focus());
                 }
                 this.broadcast('Drop', 'on-update-popper');
+                setTimeout(() => {
+                    this.filterQueryChange = false;
+                }, ANIMATION_TIMEOUT);
             },
             onQueryChange(query) {
-                if (query.length > 0 && query !== this.query) this.visible = true;
+                if (query.length > 0 && query !== this.query) {
+                  // in 'AutoComplete', when set an initial value asynchronously,
+                  // the 'dropdown list' should be stay hidden.
+                  // [issue #5150]
+                    if (this.autoComplete) {
+                        let isInputFocused =
+                            document.hasFocus &&
+                            document.hasFocus() &&
+                            document.activeElement === this.$el.querySelector('input');
+                        this.visible = isInputFocused;
+                    } else {
+                        this.visible = true;
+                    }
+                }
+
                 this.query = query;
                 this.unchangedQuery = this.visible;
+                this.filterQueryChange = true;
             },
             toggleHeaderFocus({type}){
                 if (this.disabled) {
@@ -641,17 +677,18 @@
                 if (this.getInitialValue().length > 0 && this.selectOptions.length === 0) {
                     this.hasExpectedValue = true;
                 }
-            }
+            },
         },
         watch: {
             value(value){
-                const {getInitialValue, getOptionData, publicValue} = this;
+                const {getInitialValue, getOptionData, publicValue, values} = this;
 
                 this.checkUpdateStatus();
 
                 if (value === '') this.values = [];
-                else if (JSON.stringify(value) !== JSON.stringify(publicValue)) {
+                else if (checkValuesNotEqual(value,publicValue,values)) {
                     this.$nextTick(() => this.values = getInitialValue().map(getOptionData).filter(Boolean));
+                    this.dispatch('FormItem', 'on-form-change', this.publicValue);
                 }
             },
             values(now, before){
@@ -738,10 +775,30 @@
                 if (this.slotOptions && this.slotOptions.length === 0){
                     this.query = '';
                 }
+
+                 // 当 dropdown 一开始在控件下部显示，而滚动页面后变成在上部显示，如果选项列表的长度由内部动态变更了(搜索情况)
+                 // dropdown 的位置不会重新计算，需要重新计算
+                this.broadcast('Drop', 'on-update-popper');
             },
             visible(state){
                 this.$emit('on-open-change', state);
-            }
+            },
+            slotOptions(options, old){
+                // #4626，当 Options 的 label 更新时，v-model 的值未更新
+                // remote 下，调用 getInitialValue 有 bug
+                if (!this.remote) {
+                    const values = this.getInitialValue();
+                    if (this.flatOptions && this.flatOptions.length && values.length && !this.multiple) {
+                        this.values = values.map(this.getOptionData).filter(Boolean);
+                    }
+                }
+
+                // 当 dropdown 在控件上部显示时，如果选项列表的长度由外部动态变更了，
+                // dropdown 的位置会有点问题，需要重新计算
+                if (options && old && options.length !== old.length) {
+                    this.broadcast('Drop', 'on-update-popper');
+                }
+            },
         }
     };
 </script>

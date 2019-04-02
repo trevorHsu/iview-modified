@@ -17,6 +17,7 @@ export default{
             if(menuVisible) this.visible = false;
         },
         shortcutClickHandler: function(shortcut){
+            if (this.readonly || this.disabled) return;
             this.shortcutMenuClose();
 
             if (shortcut.value) {
@@ -33,6 +34,7 @@ export default{
             }, 0);
         },
         shortcutMenuToggle: function(){
+            if (this.readonly || this.disabled) return;
             this.shortcutMenuDropdown = !this.shortcutMenuDropdown;
         },
         shortcutMenuOpen: function(){

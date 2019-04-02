@@ -11,12 +11,12 @@
                 <div :class="[datePrefixCls + '-header']" v-show="currentView !== 'time'">
                     <span
                         :class="iconBtnCls('prev', '-double')"
-                        @click="prevYear('left')"><Icon type="ios-arrow-left"></Icon></span>
+                        @click="prevYear('left')"><Icon type="ios-arrow-back"></Icon></span>
                     <span
                         v-if="leftPickerTable === 'date-table'"
                         :class="iconBtnCls('prev')"
                         @click="prevMonth('left')"
-                        v-show="currentView === 'date'"><Icon type="ios-arrow-left"></Icon></span>
+                        v-show="currentView === 'date'"><Icon type="ios-arrow-back"></Icon></span>
                     <date-panel-label
                         :date-panel-label="leftDatePanelLabel"
                         :current-view="leftDatePanelView"
@@ -24,12 +24,12 @@
                     <span
                         v-if="splitPanels || leftPickerTable !== 'date-table'"
                         :class="iconBtnCls('next', '-double')"
-                        @click="nextYear('left')"><Icon type="ios-arrow-right"></Icon></span>
+                        @click="nextYear('left')"><Icon type="ios-arrow-forward"></Icon></span>
                     <span
                         v-if="splitPanels && leftPickerTable === 'date-table'"
                         :class="iconBtnCls('next')"
                         @click="nextMonth('left')"
-                        v-show="currentView === 'date'"><Icon type="ios-arrow-right"></Icon></span>
+                        v-show="currentView === 'date'"><Icon type="ios-arrow-forward"></Icon></span>
                 </div>
                 <component
                     :is="leftPickerTable"
@@ -54,24 +54,24 @@
                     <span
                         v-if="splitPanels || rightPickerTable !== 'date-table'"
                         :class="iconBtnCls('prev', '-double')"
-                        @click="prevYear('right')"><Icon type="ios-arrow-left"></Icon></span>
+                        @click="prevYear('right')"><Icon type="ios-arrow-back"></Icon></span>
                     <span
                         v-if="splitPanels && rightPickerTable === 'date-table'"
                         :class="iconBtnCls('prev')"
                         @click="prevMonth('right')"
-                        v-show="currentView === 'date'"><Icon type="ios-arrow-left"></Icon></span>
+                        v-show="currentView === 'date'"><Icon type="ios-arrow-back"></Icon></span>
                     <date-panel-label
                         :date-panel-label="rightDatePanelLabel"
                         :current-view="rightDatePanelView"
                         :date-prefix-cls="datePrefixCls"></date-panel-label>
                     <span
                         :class="iconBtnCls('next', '-double')"
-                        @click="nextYear('right')"><Icon type="ios-arrow-right"></Icon></span>
+                        @click="nextYear('right')"><Icon type="ios-arrow-forward"></Icon></span>
                     <span
                         v-if="rightPickerTable === 'date-table'"
                         :class="iconBtnCls('next')"
                         @click="nextMonth('right')"
-                        v-show="currentView === 'date'"><Icon type="ios-arrow-right"></Icon></span>
+                        v-show="currentView === 'date'"><Icon type="ios-arrow-forward"></Icon></span>
                 </div>
                 <component
                     :is="rightPickerTable"
@@ -154,6 +154,7 @@
         data(){
             const [minDate, maxDate] = this.value.map(date => date || initTimeDate());
             const leftPanelDate = this.startDate ? this.startDate : minDate;
+            const splitPanels = this.splitPanels;
 
             return {
                 prefixCls: prefixCls,
@@ -164,7 +165,7 @@
                 leftPickerTable: `${this.selectionMode}-table`,
                 rightPickerTable: `${this.selectionMode}-table`,
                 leftPanelDate: leftPanelDate,
-                rightPanelDate: new Date(leftPanelDate.getFullYear(), leftPanelDate.getMonth(), 1)
+                rightPanelDate: splitPanels ? new Date(leftPanelDate.getFullYear(), leftPanelDate.getMonth(), 1) : new Date(leftPanelDate.getFullYear(), leftPanelDate.getMonth() + 1, 1)
             };
         },
         computed: {
@@ -237,6 +238,7 @@
                     to: this.dates[1],
                     selecting: false
                 };
+
                 this.setPanelDates(this.startDate || this.dates[0] || new Date());
             },
             currentView(currentView){
@@ -269,12 +271,15 @@
             },
             setPanelDates(leftPanelDate){
                 this.leftPanelDate = leftPanelDate;
+                let rightPanelDate;
 
-                if(this.splitPanels){
-                    this.dates[1] && (this.rightPanelDate = new Date(this.dates[1]));
-                } else{
-                    this.rightPanelDate = new Date(leftPanelDate.getFullYear(), leftPanelDate.getMonth() + 1, leftPanelDate.getDate());
+                if (this.splitPanels) {
+                    rightPanelDate = this.dates[1] ? new Date(this.dates[1]) : new Date(leftPanelDate.getFullYear(), leftPanelDate.getMonth(), 1);
+                } else {
+                   rightPanelDate = new Date(leftPanelDate.getFullYear(), leftPanelDate.getMonth() + 1, 1);
                 }
+
+                this.rightPanelDate = rightPanelDate;
             },
             panelLabelConfig (direction) {
                 const locale = this.t('i.locale');

@@ -166,6 +166,7 @@
         &[disabled]{
             cursor: @cursor-disabled;
             color: #ccc;
+            -webkit-text-fill-color: #ccc;  // #5249
         }
     }
 
@@ -205,12 +206,30 @@
         height: 24px;
         line-height: 22px;
         margin: 3px 4px 3px 0;
+        max-width: 99%;
+        position: relative;
+        span{
+            display: block;
+            margin-right: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        i{
+            display: block;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
     }
 
     &-large&-multiple .@{css-prefix}tag{
         height: 28px;
         line-height: 26px;
         font-size: @font-size-base;
+        i{
+            top: 6px;
+        }
     }
 
     &-small&-multiple .@{css-prefix}tag{
@@ -219,12 +238,23 @@
         font-size: @font-size-small;
         padding: 0 6px;
         margin: 3px 4px 2px 0;
+        span{
+            margin-right: 14px;
+        }
+        i{
+            top: 1px;
+            right: 2px;
+        }
     }
 
     &-dropdown-list {
         //display: inline-block;
         min-width: 100%;
         list-style: none;
+    }
+
+    & &-dropdown{
+        width: auto;
     }
 }
 
@@ -249,11 +279,11 @@
         .ivu-icon();
         //float: right;
         font-size: 24px;
-        content: '\F3FD';
+        content: '\F171';
         color: @selected-color;
         position: absolute;
         top: 2px;
-        right: 16px;
+        right: 8px;
     }
 }
 

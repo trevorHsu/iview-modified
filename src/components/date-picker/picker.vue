@@ -39,6 +39,7 @@
                 :placement="placement"
                 ref="drop"
                 :data-transfer="transfer"
+                :transfer="transfer"
                 v-transfer-dom>
                 <div>
                     <component
@@ -81,7 +82,7 @@
     import {directive as clickOutside} from 'v-click-outside-x';
     import TransferDom from '../../directives/transfer-dom';
     import { oneOf } from '../../utils/assist';
-    import { DEFAULT_FORMATS, RANGE_SEPARATOR, TYPE_VALUE_RESOLVER_MAP, getDayCountOfMonth } from './util';
+    import { DEFAULT_FORMATS, TYPE_VALUE_RESOLVER_MAP, getDayCountOfMonth } from './util';
     import {findComponentsDownward} from '../../utils/assist';
     import Emitter from '../../mixins/emitter';
 
@@ -171,6 +172,9 @@
             size: {
                 validator (value) {
                     return oneOf(value, ['small', 'large', 'default']);
+                },
+                default () {
+                    return !this.$IVIEW || this.$IVIEW.size === '' ? 'default' : this.$IVIEW.size;
                 }
             },
             placeholder: {
@@ -185,7 +189,9 @@
             },
             transfer: {
                 type: Boolean,
-                default: false
+                default () {
+                    return !this.$IVIEW || this.$IVIEW.transfer === '' ? false : this.$IVIEW.transfer;
+                }
             },
             name: {
                 type: String
@@ -203,6 +209,10 @@
             options: {
                 type: Object,
                 default: () => ({})
+            },
+            separator: {
+                type: String,
+                default: ' - '
             }
         },
         data(){
@@ -259,8 +269,8 @@
             },
             iconType () {
                 let icon = 'ios-calendar-outline';
-                if (this.type === 'time' || this.type === 'timerange') icon = 'ios-clock-outline';
-                if (this.showClose) icon = 'ios-close';
+                if (this.type === 'time' || this.type === 'timerange') icon = 'ios-time-outline';
+                if (this.showClose) icon = 'ios-close-circle';
                 return icon;
             },
             transition () {
@@ -313,7 +323,9 @@
                 if (this.readonly) return;
                 this.isFocused = true;
                 if (e && e.type === 'focus') return; // just focus, don't open yet
-                this.visible = true;
+                if(!this.disabled){
+                    this.visible = true;
+                }
             },
             handleBlur (e) {
                 if (this.internalFocus){
@@ -561,8 +573,9 @@
             handleInputMouseleave () {
                 this.showClose = false;
             },
-            handleIconClick () {
+            handleIconClick (e) {
                 if (this.showClose) {
+                    if (e) e.stopPropagation();
                     this.handleClear();
                 } else if (!this.disabled) {
                     this.handleFocus();
@@ -598,23 +611,23 @@
                 const multipleParser = TYPE_VALUE_RESOLVER_MAP['multiple'].parser;
 
                 if (val && type === 'time' && !(val instanceof Date)) {
-                    val = parser(val, format);
+                    val = parser(val, format, this.separator);
                 } else if (this.multiple && val) {
-                    val = multipleParser(val, format);
+                    val = multipleParser(val, format, this.separator);
                 } else if (isRange) {
                     if (!val){
                         val = [null, null];
                     } else {
                         if (typeof val === 'string') {
-                            val = parser(val, format);
+                            val = parser(val, format, this.separator);
                         } else if (type === 'timerange') {
-                            val = parser(val, format).map(v => v || '');
+                            val = parser(val, format, this.separator).map(v => v || '');
                         } else {
                             const [start, end] = val;
                             if (start instanceof Date && end instanceof Date){
                                 val = val.map(date => new Date(date));
                             } else if (typeof start === 'string' && typeof end === 'string'){
-                                val = parser(val.join(RANGE_SEPARATOR), format);
+                                val = parser(val.join(this.separator), format, this.separator);
                             } else if (!start || !end){
                                 val = [null, null];
                             }
@@ -631,13 +644,13 @@
 
                 if (this.multiple) {
                     const formatter = TYPE_VALUE_RESOLVER_MAP.multiple.formatter;
-                    return formatter(value, this.format || format);
+                    return formatter(value, this.format || format, this.separator);
                 } else {
                     const {formatter} = (
                         TYPE_VALUE_RESOLVER_MAP[this.type] ||
                         TYPE_VALUE_RESOLVER_MAP['default']
                     );
-                    return formatter(value, this.format || format);
+                    return formatter(value, this.format || format, this.separator);
                 }
             },
             onPick(dates, visible = false, type) {
@@ -648,6 +661,7 @@
                     const timeStamps = allDates.map(date => date.getTime()).filter((ts, i, arr) => arr.indexOf(ts) === i && i !== indexOfPickedDate); // filter away duplicates
                     this.internalValue = timeStamps.map(ts => new Date(ts));
                 } else {
+                    dates = this.parseDate(dates);
                     this.internalValue = Array.isArray(dates) ? dates : [dates];
                 }
 
@@ -669,6 +683,9 @@
             },
             focus() {
                 this.$refs.input && this.$refs.input.focus();
+            },
+            updatePopper () {
+                this.$refs.drop.update();
             }
         },
         watch: {
@@ -705,6 +722,7 @@
 
             // to handle focus from confirm buttons
             this.$on('focus-input', () => this.focus());
+            this.$on('update-popper', () => this.updatePopper());
         }
     };
 </script>

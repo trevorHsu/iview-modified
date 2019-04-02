@@ -5,9 +5,9 @@
 
         <DatePicker3 type="month" show-week-numbers placeholder="Select date" style="width: 200px"></DatePicker3>
         <DatePicker3 type="year" show-week-numbers placeholder="Select date" style="width: 200px"></DatePicker3>
-        <DatePicker3 type="date" split-panels transfer show-week-numbers placeholder="Select date" style="width: 400px"></DatePicker3>
+        <DatePicker3 type="date" split-panels transfer show-week-numbers placeholder="Select date" style="width: 400px" readonly></DatePicker3>
         <DatePicker3 
-            type="datetime" show-week-numbers confirm placeholder="Select date" style="width: 400px"
+            type="datetime" show-week-numbers confirm placeholder="Select date" style="width: 300px" disabled
             :options="options2" 
         ></DatePicker3>
         
@@ -32,6 +32,7 @@
             @on-ok="confirmFn"
             @on-shortcut-selected="shortcutSelected"
             size="large"
+            placement="top"
         ></DatePicker3>
         <!-- <Time-Picker :steps="[1, 1, 15]" :value="new Date()"></Time-Picker> -->
     </div>
@@ -40,7 +41,7 @@
     export default {
         data(){
             return {
-                dateData: [new Date(), new Date()],
+                dateData: ['2019-02-01 00:00:00', '2019-04-06 00:00:00'],
                 options1: {
                     shortcuts: [
                         {
@@ -104,11 +105,11 @@
                         },
                         {
                             text: '过去30天',
-                            // value () {
-                            //     const date = new Date();
-                            //     date.setTime(date.getTime() - 3600 * 1000 * 24 * 30);
-                            //     return [date, new Date()];
-                            // },
+                            value () {
+                                const date = new Date();
+                                date.setTime(date.getTime() - 3600 * 1000 * 24 * 30);
+                                return [date, new Date()];
+                            },
                             onClick: (picker) => {
                                 this.$Message.info('short cut 30');
                             }

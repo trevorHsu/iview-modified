@@ -259,7 +259,7 @@
             iconType () {
                 let icon = 'ios-calendar-outline';
                 if (this.type === 'time' || this.type === 'timerange') icon = 'ios-clock-outline';
-                if (this.showClose) icon = 'ios-close';
+                if (this.showClose) icon = 'ios-close-circle';
                 return icon;
             },
             transition () {
@@ -309,7 +309,7 @@
                 this.disableClickOutSide = false;
             },
             handleFocus (e) {
-                if (this.readonly) return;
+                if (this.readonly || this.disabled) return;
                 this.isFocused = true;
                 if (e && e.type === 'focus') return; // just focus, don't open yet
                 this.visible = true;
@@ -559,8 +559,9 @@
             handleInputMouseleave () {
                 this.showClose = false;
             },
-            handleIconClick () {
+            handleIconClick (e) {
                 if (this.showClose) {
+                    if (e) e.stopPropagation();
                     this.handleClear();
                 } else if (!this.disabled) {
                     this.handleFocus();
@@ -646,7 +647,18 @@
                     const timeStamps = allDates.map(date => date.getTime()).filter((ts, i, arr) => arr.indexOf(ts) === i && i !== indexOfPickedDate); // filter away duplicates
                     this.internalValue = timeStamps.map(ts => new Date(ts));
                 } else {
-                    this.internalValue = Array.isArray(dates) ? dates : [dates];
+                    dates = this.parseDate(dates);
+                    let internalValue = dates;
+
+                    if (Array.isArray(dates)) {
+                        let preDateVal = dates[0] && dates[0].getTime();
+                        let nextDateVal = dates[1] && dates[1].getTime();
+                        (preDateVal >= nextDateVal) && (internalValue = [dates[1], dates[0]]);
+                    } else {
+                        internalValue = [dates];
+                    }
+
+                    this.internalValue = internalValue;
                 }
 
                 if (this.internalValue[0]) this.focusedDate = this.internalValue[0];

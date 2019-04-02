@@ -20,6 +20,8 @@ import Content from './components/content';
 import DatePicker from './components/date-picker';
 import DatePicker2 from './components/date-picker2';
 import DatePicker3 from './components/date-picker3';
+import Divider from './components/divider';
+import Drawer from './components/drawer';
 import Dropdown from './components/dropdown';
 import Footer from './components/footer';
 import Form from './components/form';
@@ -46,7 +48,6 @@ import Spin from './components/spin';
 import Steps from './components/steps';
 import Switch from './components/switch';
 import Table from './components/table';
-import TableLazy from './components/table-lazy';
 import Tabs from './components/tabs';
 import Tag from './components/tag';
 import Time from './components/time';
@@ -58,7 +59,6 @@ import Tree from './components/tree';
 import Upload from './components/upload';
 import {Row, Col} from './components/grid';
 import {Select, Option, OptionGroup} from './components/select';
-import Divider from './components/divider';
 import locale from './locale/index';
 
 const components = {
@@ -89,6 +89,8 @@ const components = {
     DatePicker,
     DatePicker2,
     DatePicker3,
+    Divider,
+    Drawer,
     Dropdown,
     DropdownItem: Dropdown.Item,
     DropdownMenu: Dropdown.Menu,
@@ -127,7 +129,6 @@ const components = {
     Step: Steps.Step,
     Steps,
     Table,
-    TableLazy,
     Tabs: Tabs,
     TabPane: Tabs.Pane,
     Tag,
@@ -138,8 +139,7 @@ const components = {
     Tooltip,
     Transfer,
     Tree,
-    Upload,
-    Divider
+    Upload
 };
 
 const iview = {
@@ -158,7 +158,6 @@ const iview = {
     iSelect: Select,
     iSwitch: Switch,
     iTable: Table,
-    iTableLazy: TableLazy,
     iTime: Time
 };
 
@@ -170,6 +169,11 @@ const install = function(Vue, opts = {}) {
     Object.keys(iview).forEach(key => {
         Vue.component(key, iview[key]);
     });
+
+    Vue.prototype.$IVIEW = {
+        size: opts.size || '',
+        transfer: 'transfer' in opts ? opts.transfer : ''
+    };
 
     Vue.prototype.$Loading = LoadingBar;
     Vue.prototype.$Message = Message;

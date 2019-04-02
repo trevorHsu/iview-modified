@@ -4,7 +4,7 @@
             {{labels.time}}
         </i-button>
         <i-button-group>
-            <i-button size="small" type="ghost" @click.native="handleClear" @keydown.enter.native="handleClear">
+            <i-button size="small" type="primary" ghost @click.native="handleClear" @keydown.enter.native="handleClear">
                 {{labels.clear}}
             </i-button>
             <i-button size="small" type="primary" @click.native="handleSuccess" @keydown.enter.native="handleSuccess">

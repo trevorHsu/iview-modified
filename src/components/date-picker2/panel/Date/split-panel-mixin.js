@@ -29,7 +29,7 @@ export default {
             } else {
                 this.rangeState.selecting = false;
             }
-            
+
             if (!this.rangeState.selecting) {
                 const [minDate, maxDate] = [this.rangeState.from, this.rangeState.to].sort(dateSorter);
                 this.dates = [minDate, maxDate];
